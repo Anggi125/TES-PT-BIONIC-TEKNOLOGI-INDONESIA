@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_bionic
+    environment:
+      POSTGRES_DB: Bionic
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: givalyamplo12
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bionic_net
+
+  app:
+    build: .
+    container_name: bionic_app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: Bionic
+      DB_USER: postgres
+      DB_PASSWORD: givalyamplo12
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - bionic_net
+
+volumes:
+  postgres_data:
+
+networks:
+  bionic_net:
