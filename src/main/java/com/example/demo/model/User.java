@@ -2,7 +2,6 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -27,25 +26,21 @@ public class User {
     @Column(nullable = false)
     private Status status = Status.ACTIVE;
 
-    // One-to-One ke Profile
+    // Relasi ke Profile (One-to-One)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile;
 
-    // Many-to-Many ke Role
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    // Relasi ke Role (Many User → One Role)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     public enum Status {
         ACTIVE,
         INACTIVE
     }
 
-    // Helper method untuk relasi dua arah (opsional)
+    // Helper method untuk profile
     public void setProfile(Profile profile) {
         this.profile = profile;
         if (profile != null) {

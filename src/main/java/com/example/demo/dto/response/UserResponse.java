@@ -1,7 +1,6 @@
 package com.example.demo.dto.response;
 
 import lombok.*;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -11,7 +10,7 @@ import java.util.Set;
 public class UserResponse {
     private Long id;
     private String email;
+    private String role;
     private String status;
-    private Set<String> roles;
     private ProfileResponse profile;
 }

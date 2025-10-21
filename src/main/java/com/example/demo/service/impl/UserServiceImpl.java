@@ -16,16 +16,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final JwtUtil jwtUtil; 
+    private final JwtUtil jwtUtil;
 
     @Override
     @Transactional
@@ -39,9 +36,9 @@ public class UserServiceImpl implements UserService {
 
         User user = User.builder()
                 .email(request.getEmail())
-                .password(request.getPassword()) // nanti diganti ke BCrypt
+                .password(request.getPassword()) // nanti bisa diganti ke BCrypt
                 .status(User.Status.ACTIVE)
-                .roles(Set.of(defaultRole))
+                .role(defaultRole)
                 .build();
 
         Profile profile = Profile.builder()
@@ -61,10 +58,8 @@ public class UserServiceImpl implements UserService {
         return UserResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .role(user.getRole().getName().name())
                 .status(user.getStatus().name())
-                .roles(user.getRoles().stream()
-                        .map(role -> role.getName().name())
-                        .collect(Collectors.toSet()))
                 .profile(ProfileResponse.builder()
                         .id(user.getProfile().getId())
                         .fullName(user.getProfile().getFullName())
@@ -83,9 +78,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Password salah.");
         }
 
-      
         String token = jwtUtil.generateToken(user.getEmail());
-
         return new LoginResponseDto(token, "Bearer");
     }
 }
