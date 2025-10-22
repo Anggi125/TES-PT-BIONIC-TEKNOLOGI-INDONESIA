@@ -1,7 +1,6 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.response.UserViewResponse;
-import com.example.demo.model.view.UserDetailsView;
 import com.example.demo.repository.view.UserDetailsViewRepository;
 import com.example.demo.service.UserViewService;
 import lombok.RequiredArgsConstructor;
