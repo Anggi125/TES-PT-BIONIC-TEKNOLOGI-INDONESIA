@@ -1,13 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.UpdateUserRequestDto;
+import com.example.demo.dto.response.PagedResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/users")
@@ -16,10 +19,19 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
+    // @GetMapping("/all")
+    // public ResponseEntity<List<UserResponse>> getAllUsers() {
+    //     return ResponseEntity.ok(adminUserService.getAllUsers());
+    // }
     @GetMapping("/all")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(adminUserService.getAllUsers());
-    }
+public ResponseEntity<PagedResponse<UserResponse>> getAllUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction
+) {
+    return ResponseEntity.ok(adminUserService.getAllUsers(page, size, sortBy, direction));
+}
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
@@ -42,9 +54,15 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.updateUserStatus(id, active));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        adminUserService.deleteUser(id);
-        return ResponseEntity.noContent().build();
-    }
+      @DeleteMapping("/{id}")
+public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
+    UserResponse deletedUser = adminUserService.deleteUser(id);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "User berhasil dihapus");
+    response.put("data", deletedUser);
+
+    return ResponseEntity.ok(response);
+}
+
 }

@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.UpdateUserRequestDto;
+import com.example.demo.dto.response.PagedResponse;
 import com.example.demo.dto.response.ProfileResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.exception.BadRequestException;
@@ -10,6 +11,11 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,13 +50,39 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .build();
     }
 
+    // @Override
+    // public List<UserResponse> getAllUsers() {
+    //     return userRepository.findAll()
+    //             .stream()
+    //             .map(this::mapToResponse)
+    //             .collect(Collectors.toList());
+    // }
+
     @Override
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+public PagedResponse<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
+    Sort sort = direction.equalsIgnoreCase("desc")
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+
+    Page<User> userPage = userRepository.findAll(pageable);
+
+    List<UserResponse> users = userPage
+            .getContent()
+            .stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+
+    return PagedResponse.<UserResponse>builder()
+            .content(users)
+            .currentPage(userPage.getNumber())
+            .totalPages(userPage.getTotalPages())
+            .totalElements(userPage.getTotalElements())
+            .pageSize(userPage.getSize())
+            .last(userPage.isLast())
+            .build();
+}
 
     @Override
     public UserResponse getUserById(Long id) {
@@ -95,10 +127,17 @@ public class AdminUserServiceImpl implements AdminUserService {
         return mapToResponse(userRepository.save(user));
     }
 
-    @Override
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        userRepository.delete(user);
-    }
+@Override
+public UserResponse deleteUser(Long id) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    // simpan dulu data user untuk response
+    UserResponse deletedUserResponse = mapToResponse(user);
+
+    userRepository.delete(user);
+
+    return deletedUserResponse;
+}
+
 }

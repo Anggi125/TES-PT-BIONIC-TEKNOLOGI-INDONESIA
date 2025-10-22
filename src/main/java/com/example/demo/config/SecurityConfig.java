@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import com.example.demo.security.JwtAuthFilter;
 import com.example.demo.security.CustomAccessDeniedHandler;
+import com.example.demo.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,21 +34,22 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/v3/api-docs/**", 
-                    "/swagger-ui/**", 
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/swagger-resources/**",
                     "/webjars/**",
                     "/auth/**"
                 ).permitAll()
                 .requestMatchers("/profiles/**").hasAnyRole("ADMIN", "CUSTOMER", "MITRA")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**", "/view/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(ex -> ex
-                .accessDeniedHandler(customAccessDeniedHandler) // 🔹 Tambahkan handler custom
+                .authenticationEntryPoint(customAuthenticationEntryPoint) // 401 → belum login
+                .accessDeniedHandler(customAccessDeniedHandler)            // 403 → role tidak cukup
             );
 
         return http.build();
