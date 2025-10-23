@@ -23,12 +23,12 @@ Aplikasi ini dirancang untuk dijalankan dengan cepat menggunakan Docker Compose.
 
 #### 1. Eksekusi Skrip Instalasi dan Deployment
 
-Ganti `<URL_REPOSITORY_ANDA>` dengan URL repositori Git Anda dan `<NAMA_FOLDER_PROYEK>` dengan nama direktori tujuan.
+Ganti `https://github.com/Anggi125/TES-PT-BIONIC-TEKNOLOGI-INDONESIA.git` dengan URL repositori Git Anda dan `TES-PT-BIONIC-TEKNOLOGI-INDONESIA` dengan nama direktori tujuan.
 
 ```bash
 # 1. Clone repositori dan navigasi ke direktori proyek
-git clone https://github.com/Anggi125/TES-PT-BIONIC-TEKNOLOGI-INDONESIA.git
-cd <NAMA_FOLDER_PROYEK>
+git clone `https://github.com/Anggi125/TES-PT-BIONIC-TEKNOLOGI-INDONESIA.git`
+cd `TES-PT-BIONIC-TEKNOLOGI-INDONESIA`
 
 # 2. Bangun image dan jalankan semua kontainer (aplikasi & database) dalam mode detached (-d)
 # Opsi '--build' memastikan image Spring Boot terbaru dibuat sebelum deployment
